@@ -7,29 +7,23 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold">Tutor List</h2>
             
             <!-- Quick Stats Card -->
-            <div class="mb-8">
-                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 max-w-sm">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                            </svg>
+            <div class="mt-10 w-full">
+                    <div class="bg-blue-100 p-10 rounded-2xl shadow-lg text-center w-full">
+                        <div class="flex items-center justify-center text-purple-600 mb-6">
+                            <span class="text-7xl">👩‍🏫</span>
                         </div>
-                        <div class="ml-4">
-                            <h3 class="text-sm font-medium text-gray-500">Total Tutors</h3>
-                            <p class="text-2xl font-bold text-gray-900">
-                                @if(method_exists($tutorList, 'total'))
-                                    {{ $tutorList->total() }}
-                                @else
-                                    {{ count($tutorList) }}
-                                @endif
-                            </p>
-                        </div>
+                        <h3 class="text-2xl font-semibold text-blue-700">Total Registered Tutors</h3>
+                        <p class="text-5xl font-bold mt-2">@if(method_exists($tutorList, 'total'))
+                {{ $tutorList->total() }}
+            @else
+                {{ count($tutorList) }}
+            @endif</p>
                     </div>
                 </div>
-            </div>
+
 
             <!-- Main Content Card -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -69,21 +63,12 @@
                 <!-- Search and Filter Section -->
                 <div class="px-6 py-4 bg-white border-b border-gray-200">
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="relative">
-                            <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Search tutors..." 
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </div>
                         
                         <select name="level_filter" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="">All Levels</option>
-                            <option value="Primary" {{ request('level_filter') == 'Primary' ? 'selected' : '' }}>Primary</option>
-                            <option value="Secondary" {{ request('level_filter') == 'Secondary' ? 'selected' : '' }}>Secondary</option>
-                            <option value="Pre-University" {{ request('level_filter') == 'Pre-University' ? 'selected' : '' }}>Pre-University</option>
-                            <option value="University" {{ request('level_filter') == 'University' ? 'selected' : '' }}>University</option>
+                            <option value="sekolah rendah" {{ request('level_filter') == 'sekolah rendah' ? 'selected' : '' }}>Sekolah rendah</option>
+                            <option value="sekolah menengah" {{ request('level_filter') == 'sekolah menengah' ? 'selected' : '' }}>Sekolah menengah</option>
+                            <option value="sekolah agama" {{ request('level_filter') == 'sekolah agama' ? 'selected' : '' }}>Sekolah agama</option>
                         </select>
                         
                         <div class="flex gap-2">
@@ -207,18 +192,14 @@
                                             
                                             
                                             <a href="{{ route('tutors.edit', $tutor->id) }}" class="text-indigo-600 hover:text-indigo-800 transition-colors" title="Edit">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                                </svg>
+                                                ✏️
                                             </a>
 
                                             <form action="{{ route('tutors.destroy', $tutor->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this tutor? This action cannot be undone.')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Delete">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                    </svg>
+                                                    🗑️
                                                 </button>
                                             </form>
                                         </div>
@@ -280,72 +261,87 @@
 
     <script>
         function generateReport() {
-            document.getElementById('reportModal').classList.remove('hidden');
-            
-            // Sample report data - replace with actual data from backend
-            const reportContent = `
-                <div class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-blue-900">Total Tutors</h4>
-                            <p class="text-2xl font-bold text-blue-600">${document.querySelectorAll('tbody tr').length > 0 ? document.querySelectorAll('tbody tr').length - 1 : 0}</p>
+    document.getElementById('reportModal').classList.remove('hidden');
+
+    const rows = document.querySelectorAll('tbody tr');
+    const totalTutors = rows.length;
+
+    // Initialize counters
+    let rendah = 0, menengah = 0, agama = 0;
+
+    // Loop through each row to count tutors by level
+    rows.forEach(row => {
+        const level = row.getAttribute('data-level');
+        switch (level?.toLowerCase()) {
+            case 'sekolah rendah':
+                rendah++;
+                break;
+            case 'sekolah menengah':
+                menengah++;
+                break;
+            case 'sekolah agama':
+                agama++;
+                break;
+        }
+    });
+
+    const reportContent = `
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-blue-900">Total Tutors</h4>
+                    <p class="text-2xl font-bold text-blue-600">${totalTutors}</p>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h4 class="font-semibold mb-3">Performance Summary</h4>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">
+                        Generated on: ${new Date().toLocaleString()}<br>
+                        This report provides an overview of the current tutor management system status.
+                    </p>
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="font-medium mb-2">Level Distribution</h5>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
+                            <span class="text-sm">Sekolah Rendah</span>
+                            <span class="text-sm font-medium">${rendah} tutors</span>
                         </div>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <h4 class="font-semibold mb-3">Performance Summary</h4>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">
-                                Generated on: ${new Date().toLocaleString()}<br>
-                                This report provides an overview of the current tutor management system status.
-                            </p>
+                        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
+                            <span class="text-sm">Sekolah Menengah</span>
+                            <span class="text-sm font-medium">${menengah} tutors</span>
                         </div>
-                        
-                        <div class="mt-4">
-                            <h5 class="font-medium mb-2">Level Distribution</h5>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                                    <span class="text-sm">Primary Level</span>
-                                    <span class="text-sm font-medium">-- tutors</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                                    <span class="text-sm">Secondary Level</span>
-                                    <span class="text-sm font-medium">-- tutors</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                                    <span class="text-sm">Pre-University Level</span>
-                                    <span class="text-sm font-medium">-- tutors</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                                    <span class="text-sm">University Level</span>
-                                    <span class="text-sm font-medium">-- tutors</span>
-                                </div>
-                            </div>
+                        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
+                            <span class="text-sm">Sekolah Agama</span>
+                            <span class="text-sm font-medium">${agama} tutors</span>
                         </div>
-                        
-                        <div class="mt-4">
-                            <h5 class="font-medium mb-2">Recommendations</h5>
-                            <ul class="text-sm text-gray-600 space-y-1">
-                                <li>• Consider recruiting more tutors for high-demand levels</li>
-                                <li>• Review unassigned tutors for potential subject matching</li>
-                                <li>• Regular performance evaluations recommended</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end mt-6">
-                        <button onclick="printReport()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mr-2">
-                            Print Report
-                        </button>
-                        <button onclick="downloadReport()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                            Download PDF
-                        </button>
                     </div>
                 </div>
-            `;
-            
-            document.getElementById('reportContent').innerHTML = reportContent;
-        }
+
+                <div class="mt-4">
+                    <h5 class="font-medium mb-2">Recommendations</h5>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Consider recruiting more tutors for high-demand levels</li>
+                        <li>• Review unassigned tutors for potential subject matching</li>
+                        <li>• Regular performance evaluations recommended</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button onclick="printReport()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mr-2">
+                    Print Report
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('reportContent').innerHTML = reportContent;
+}
+
 
         function closeModal() {
             document.getElementById('reportModal').classList.add('hidden');

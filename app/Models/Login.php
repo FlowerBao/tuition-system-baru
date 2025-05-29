@@ -13,7 +13,14 @@ class Login extends Model
         'user_id',
         'logged_in_at',
         'action',
+        'ip_address',
+        'user_agent',
     ];
+
+    protected $casts = [
+        'logged_in_at' => 'datetime',
+    ];
+
 
     public function user()
     {

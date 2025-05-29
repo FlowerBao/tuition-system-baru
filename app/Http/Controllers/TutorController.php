@@ -16,12 +16,22 @@ class TutorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
 {
-    // Get all tutors with their assigned subject
-    $tutorList = Tutor::with('subject')->paginate(10); // Adjust pagination as needed
+    $query = Tutor::with('subject');
+
+    // Filter by subject level if selected
+    if ($request->filled('level_filter')) {
+        $query->whereHas('subject', function ($q) use ($request) {
+            $q->where('level', $request->level_filter);
+        });
+    }
+
+    $tutorList = $query->paginate(10);
+
     return view('tutors.index', compact('tutorList'));
 }
+
 
     /**
      * Show the form for creating a new resource.
