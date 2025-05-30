@@ -52,8 +52,8 @@ class RegisteredUserController extends Controller
             'parent_name' => $request->name, // Updated to parent_name
             'parent_ic' => $request->ic,           // Updated to ic
             'parent_email' => $request->email,
-            'phone' => $request->phone,     // Updated to phone
-            'address' => $request->address, // Updated to address
+            'parent_phone' => $request->phone,     // Updated to phone
+            'parent_address' => $request->address, // Updated to address
         ]);
 
         event(new Registered($user));
