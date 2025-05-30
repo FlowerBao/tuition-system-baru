@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
         ParentInfo::create([
             'user_id' => $user->id,
             'parent_name' => $request->name, // Updated to parent_name
-            'ic' => $request->ic,           // Updated to ic
+            'parent_ic' => $request->ic,           // Updated to ic
             'parent_email' => $request->email,
             'phone' => $request->phone,     // Updated to phone
             'address' => $request->address, // Updated to address
