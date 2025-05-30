@@ -17,7 +17,7 @@ class MaterialController extends Controller
    public function index()
 {
     $user = auth()->user();
-    $isParent = $user->role === 'parent';
+    $isParent = $user->role === 'parents';
 
     $selectedStudentId = request('student_id');
     $selectedSubjectId = request('subject_id');

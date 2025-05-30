@@ -34,7 +34,7 @@ class DashboardController extends Controller
             return view('dashboard', compact('subjectsWithCounts'));
         }
 
-        if ($user->role === 'parent') {
+        if ($user->role === 'parents') {
             $parentInfo = $user->parentInfo;
 
             $totalParentStudents = 0;

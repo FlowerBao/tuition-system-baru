@@ -68,7 +68,6 @@ class StudentListController extends Controller
         'phone' => $request->phone,
         'user_id' => $studentUser->id,
         'parent_id' => $parentInfo->id,
-        // 'subject_id' => removed here
     ]);
 
     // Create enrollment record linking student and subject

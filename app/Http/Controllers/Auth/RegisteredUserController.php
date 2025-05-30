@@ -43,7 +43,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'parent', // assuming this column exists in `users`
+            'role' => 'parents', // assuming this column exists in `users`
         ]);
 
         // Create the ParentInfo entry with correct column names

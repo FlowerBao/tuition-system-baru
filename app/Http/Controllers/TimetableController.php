@@ -190,7 +190,7 @@ class TimetableController extends Controller
             return view('timetables.display', compact('timetables'));
         }
 
-        if (Auth::user()->role === 'parent') {
+        if (Auth::user()->role === 'parents') {
             // Get student IDs under this parent
             $studentIds = StudentList::where('parent_id', $userId)->pluck('id');
 

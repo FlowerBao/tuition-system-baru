@@ -49,7 +49,7 @@ class ParentInfoController extends Controller
                     'name' => $validatedData['parent__name'],
                     'email' => $validatedData['parent__email'],
                     'password' => Hash::make($validatedData['password']),
-                    'role' => 'parent'
+                    'role' => 'parents'
                 ]);
     
                 Staff::create([
