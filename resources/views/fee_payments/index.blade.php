@@ -7,6 +7,7 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold">Fee List</h2>
             {{-- Enhanced Filter Section --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
                 <div class="flex items-center mb-4">
@@ -242,7 +243,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="ml-6">
-                                                        @if(auth()->user()->role === 'parent')
+                                                        @if(auth()->user()->role === 'parents')
                                                             <form method="POST" action="{{ route('fee_payments.pay') }}" class="inline-block">
                                                                 @csrf
                                                                 <input type="hidden" name="student_id" value="{{ $student->id }}">

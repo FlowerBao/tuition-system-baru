@@ -56,7 +56,7 @@
                             @endforeach
                         </div>
                     </div>
-                @elseif(auth()->user()->role === 'parent')
+                @elseif(auth()->user()->role === 'parents')
                     <div class="bg-yellow-100 p-6 rounded-lg shadow text-center">
                         <div class="text-6xl text-yellow-600 mb-4">👪</div>
                         <h3 class="text-lg font-semibold text-yellow-800">Total Students Registered Under Your Account</h3>

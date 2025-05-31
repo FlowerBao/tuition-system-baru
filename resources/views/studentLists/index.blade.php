@@ -7,6 +7,7 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold">Children Registration</h2>
             <!-- Quick Actions Card -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
                 <div class="flex items-center justify-between">
