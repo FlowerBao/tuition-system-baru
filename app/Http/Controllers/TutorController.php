@@ -9,6 +9,8 @@ use App\Models\Timetable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\TutorRegisteredMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class TutorController extends Controller
@@ -50,45 +52,44 @@ class TutorController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
-        $validatedData = $request->validate([
-            'tutor_name' => 'required|string|max:255',
-            'tutor_ic' => 'required|string',
-            'tutor_email' => 'required|email|unique:tutors,tutor_email|unique:users,email',
-            'tutor_phone' => 'required|string',
-            'tutor_address' => 'nullable|string',
-            'password' => 'required|min:8',
-            'subject_id' => 'required|exists:subjects,id', // Ensure the subject_id exists in the subjects table
-        ]);
-    
-        try {
-            DB::transaction(function () use ($validatedData) {
-                $user = User::create([
-                    'name' => $validatedData['tutor_name'],
-                    'email' => $validatedData['tutor_email'],
-                    'password' => Hash::make($validatedData['password']),
-                    'role' => 'tutor'
-                ]);
-    
-                $tutor = Tutor::create([
-                    'user_id' => $user->id,
-                    'subject_id' => $validatedData['subject_id'], // Assign the subject
-                    'tutor_name' => $validatedData['tutor_name'],
-                    'tutor_ic' => $validatedData['tutor_ic'],
-                    'tutor_email' => $validatedData['tutor_email'],
-                    'tutor_phone' => $validatedData['tutor_phone'],
-                    'tutor_address' => $validatedData['tutor_address'] ?? null,
-                ]);
+{
+    $request->validate([
+        'tutor_name' => 'required|string|max:255',
+        'tutor_ic' => 'required|string|max:20|unique:tutors,tutor_ic',
+        'tutor_email' => 'required|email|unique:users,email',
+        'tutor_phone' => 'required|string|max:20',
+        'tutor_address' => 'required|string',
+        'password' => 'required|string|min:6',
+        'subject_id' => 'required|exists:subjects,id',
+    ]);
 
-            });
-    
-            return redirect()->route('tutors.index')->with('success', 'Tutor registered successfully');
-        } catch (\Exception $e) {
-            \Log::error('Error registering tutor: ' . $e->getMessage());
-            return back()->with('error', 'Error registering tutor. Check logs for details' . $e->getMessage())->withInput();
-        }
-    }
+    // Create user
+    $user = User::create([
+        'name' => $request->tutor_name,
+        'email' => $request->tutor_email,
+        'password' => bcrypt($request->password),
+        'role' => 'tutor',
+    ]);
+
+    // Create tutor linked to user
+   Tutor::create([
+    'user_id' => $user->id,
+    'tutor_ic' => $request->tutor_ic,
+    'tutor_name' => $request->tutor_name,
+    'tutor_email' => $request->tutor_email,
+    'tutor_phone' => $request->tutor_phone,
+    'tutor_address' => $request->tutor_address,
+    'subject_id' => $request->subject_id,
+]);
+
+
+    // Send registration email
+    Mail::to($request->tutor_email)->send(
+        new TutorRegisteredMail($request->tutor_name, $request->tutor_email, $request->password)
+    );
+
+    return redirect()->route('tutors.index')->with('success', 'Tutor registered and email sent successfully.');
+}
 
         
 
@@ -162,5 +163,7 @@ class TutorController extends Controller
         $tutor->delete(); // equivalent to delete from table_name where id="";
         return redirect()->back()->with('message', 'Tutor deleted successfully');
     }
+    
+
     
 }

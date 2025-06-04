@@ -24,11 +24,13 @@
                             <label for="student_id" class="block font-semibold mb-1">Select Student:</label>
                             <select name="student_id" id="student_id" class="w-full border rounded p-2" onchange="this.form.submit()">
                                 <option value="">-- All Students --</option>
-                                @foreach($students as $student)
+                                @forelse($students as $student)
                                     <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
                                         {{ $student->name }}
                                     </option>
-                                @endforeach
+                                @empty
+                                    <option value="" disabled>No students found for this parent.</option>
+                                @endforelse
                             </select>
                         </div>
 

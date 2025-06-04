@@ -65,6 +65,7 @@ Route::get('/timetable', [TimetableController::class, 'display'])->name('timetab
 Route::get('/timetables/export', [TimetableController::class, 'export'])->name('timetables.export');
 Route::get('/timetables/report', [TimetableController::class, 'report'])->name('timetables.report');
 Route::get('/timetables/download-pdf', [TimetableController::class, 'downloadPdf'])->name('timetables.download.pdf');
+Route::get('/timetables/export-pdf', [TimetableController::class, 'exportPdf'])->name('timetable.exportPdf');
 
 Route::get('/subjects/cleanup', [SubjectController::class, 'cleanupOrphans'])->name('subjects.cleanup');
 
@@ -106,12 +107,12 @@ Route::get('/get-subjects/{level}', [App\Http\Controllers\SubjectController::cla
 
 
 //tutor certificate create
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/certificates/create', function () {
-        abort_unless(auth()->user()->role === 'admin', 403);
-        return view('certificates.create');
-    })->name('certificates.create');
-});
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     Route::get('/certificates/create', function () {
+//         abort_unless(auth()->user()->role === 'admin', 403);
+//         return view('certificates.create');
+//     })->name('certificates.create');
+// });
 
 //login status
 // Route::middleware(['auth', 'admin'])->group(function () {

@@ -15,64 +15,84 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TimetableController extends Controller
 {
-    public function index(Request $request)
-    {
-        $selectedLevel = $request->input('level');
-        $selectedClass = $request->input('subject_class');
+   public function index(Request $request)
+{
+    $selectedLevel = $request->input('level');
+    $selectedClass = $request->input('subject_class');
 
-        $timetableList = Timetable::with('subject')->get();
+    // Build timetable query with filters
+    $timetableQuery = Timetable::with('subject');
 
-        $subjectReportQuery = DB::table('subjects')
-            ->leftJoin('enrollments', 'subjects.id', '=', 'enrollments.subject_id')
-            ->leftJoin('student_lists', 'enrollments.student_id', '=', 'student_lists.id')
-            ->select('subjects.name as subject', 'subjects.level', 'subjects.subject_class', DB::raw('COUNT(student_lists.id) as student_count'))
-            ->groupBy('subjects.name', 'subjects.level', 'subjects.subject_class');
+    if ($selectedLevel) {
+        $timetableQuery->whereHas('subject', function ($q) use ($selectedLevel) {
+            $q->where('level', $selectedLevel);
+        });
+    }
 
-        if ($selectedLevel) {
-            $subjectReportQuery->where('subjects.level', $selectedLevel);
-        }
+    if ($selectedClass) {
+        $timetableQuery->whereHas('subject', function ($q) use ($selectedClass) {
+            $q->where('subject_class', $selectedClass);
+        });
+    }
+
+    $timetableList = $timetableQuery->get();
+
+    // Count distinct subjects in timetableList
+    $totalSubjects = $timetableList->pluck('subject.id')->unique()->count();
+
+    // Your existing subject report query with filters
+    $subjectReportQuery = DB::table('subjects')
+        ->leftJoin('enrollments', 'subjects.id', '=', 'enrollments.subject_id')
+        ->leftJoin('student_lists', 'enrollments.student_id', '=', 'student_lists.id')
+        ->select('subjects.name as subject', 'subjects.level', 'subjects.subject_class', DB::raw('COUNT(student_lists.id) as student_count'))
+        ->groupBy('subjects.name', 'subjects.level', 'subjects.subject_class');
+
+    if ($selectedLevel) {
+        $subjectReportQuery->where('subjects.level', $selectedLevel);
+    }
+
+    if ($selectedClass) {
+        $subjectReportQuery->where('subjects.subject_class', $selectedClass);
+    }
+
+    $subjectReport = $subjectReportQuery->paginate(10);
+
+    // Chart data logic stays the same...
+    $getChartData = function ($levelName) use ($selectedClass) {
+        $query = DB::table('subjects')
+            ->join('enrollments', 'subjects.id', '=', 'enrollments.subject_id')
+            ->join('student_lists', 'enrollments.student_id', '=', 'student_lists.id')
+            ->where('subjects.level', $levelName)
+            ->select('subjects.name as subject', DB::raw('COUNT(student_lists.id) as student_count'))
+            ->groupBy('subjects.name');
 
         if ($selectedClass) {
-            $subjectReportQuery->where('subjects.subject_class', $selectedClass);
+            $query->where('subjects.subject_class', $selectedClass);
         }
 
-        $subjectReport = $subjectReportQuery->paginate(10);
+        return $query->get();
+    };
 
-        // Chart data
-        $getChartData = function ($levelName) use ($selectedClass) {
-            $query = DB::table('subjects')
-                ->join('enrollments', 'subjects.id', '=', 'enrollments.subject_id')
-                ->join('student_lists', 'enrollments.student_id', '=', 'student_lists.id')
-                ->where('subjects.level', $levelName)
-                ->select('subjects.name as subject', DB::raw('COUNT(student_lists.id) as student_count'))
-                ->groupBy('subjects.name');
+    $menengahSubjects = $getChartData('sekolah menengah');
+    $rendahSubjects = $getChartData('sekolah rendah');
+    $agamaSubjects = $getChartData('sekolah agama');
 
-            if ($selectedClass) {
-                $query->where('subjects.subject_class', $selectedClass);
-            }
+    $levels = Subject::select('level')->distinct()->pluck('level');
+    $subjectClasses = Subject::select('subject_class')->distinct()->pluck('subject_class');
 
-            return $query->get();
-        };
-
-        $menengahSubjects = $getChartData('sekolah menengah');
-        $rendahSubjects = $getChartData('sekolah rendah');
-        $agamaSubjects = $getChartData('sekolah agama');
-
-        $levels = Subject::select('level')->distinct()->pluck('level');
-        $subjectClasses = Subject::select('subject_class')->distinct()->pluck('subject_class');
-
-        return view('timetables.index', compact(
-            'timetableList',
-            'subjectReport',
-            'menengahSubjects',
-            'rendahSubjects',
-            'agamaSubjects',
-            'levels',
-            'subjectClasses',
-            'selectedLevel',
-            'selectedClass'
-        ));
-    }
+    return view('timetables.index', compact(
+        'timetableList',
+        'subjectReport',
+        'menengahSubjects',
+        'rendahSubjects',
+        'agamaSubjects',
+        'levels',
+        'subjectClasses',
+        'selectedLevel',
+        'selectedClass',
+        'totalSubjects' // <-- pass this to the view!
+    ));
+}
 
     public function create()
     {
@@ -82,43 +102,38 @@ class TimetableController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'level' => 'required|string',
-            'subject_class' => 'required|integer',
-            'day' => 'required|string',
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'classroom_name' => 'required|string',
-            'user_id' => 'required|exists:users,id',
-        ]);
+{
+    // Validate input
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        'level' => 'required|string',
+        'subject_class' => 'required|integer',
+        'day' => 'required|string',
+        'start_time' => 'required|date_format:H:i',
+        'end_time' => 'required|date_format:H:i|after:start_time',
+        'classroom_name' => 'required|string|max:255',
+    ]);
 
-        DB::transaction(function () use ($validated) {
-            $subject = Subject::create([
-                'name' => $validated['name'],
-                'price' => $validated['price'],
-                'level' => $validated['level'],
-                'subject_class' => $validated['subject_class'],
-            ]);
+    // Create the subject
+    $subject = Subject::create([
+        'name' => $validated['name'],
+        'price' => $validated['price'],
+        'level' => $validated['level'],
+        'subject_class' => $validated['subject_class'],
+    ]);
 
-            Tutor::create([
-                'user_id' => $validated['user_id'],
-                'subject_id' => $subject->id,
-            ]);
+    // Create the timetable linked to this subject
+    Timetable::create([
+        'subject_id' => $subject->id,
+        'day' => $validated['day'],
+        'start_time' => $validated['start_time'],
+        'end_time' => $validated['end_time'],
+        'classroom_name' => $validated['classroom_name'],
+    ]);
 
-            Timetable::create([
-                'day' => $validated['day'],
-                'start_time' => $validated['start_time'],
-                'end_time' => $validated['end_time'],
-                'classroom_name' => $validated['classroom_name'],
-                'subject_id' => $subject->id,
-            ]);
-        });
-
-        return redirect()->route('timetables.index')->with('success', 'Subject, tutor, and timetable registered successfully.');
-    }
+    return redirect()->route('timetables.index')->with('success', 'Subject and timetable registered successfully.');
+}
 
     public function show(Timetable $timetable)
     {

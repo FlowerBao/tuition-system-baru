@@ -1,28 +1,31 @@
 <x-app-layout>
     <x-slot name="header">  
         <h2 class="font-semibold text-xl text-grey leading-tight bg-blue-200 px-4 py-2 rounded">
-            {{ __('Tutor Details') }}
+            {{ __('Tutor Management') }}
         </h2>
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <h2 class="text-2xl font-bold">Tutor List</h2>
+            <h2 class="text-2xl font-bold">Tutor Management</h2>
             
             <!-- Quick Stats Card -->
-            <div class="mt-10 w-full">
-                    <div class="bg-blue-100 p-10 rounded-2xl shadow-lg text-center w-full">
-                        <div class="flex items-center justify-center text-purple-600 mb-6">
-                            <span class="text-7xl">👩‍🏫</span>
-                        </div>
-                        <h3 class="text-2xl font-semibold text-blue-700">Total Registered Tutors</h3>
-                        <p class="text-5xl font-bold mt-2">@if(method_exists($tutorList, 'total'))
-                {{ $tutorList->total() }}
-            @else
-                {{ count($tutorList) }}
-            @endif</p>
-                    </div>
+            <div class="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 p-8 rounded-2xl shadow-2xl text-white mb-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+                <div class="relative z-10 text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <span class="text-8xl drop-shadow-lg">👩‍🏫</span>
                 </div>
+                    <h3 class="text-2xl font-bold mb-2">Total Registered Tutors</h3>
+                        <p class="text-6xl font-black mb-2 drop-shadow-lg">@if(method_exists($tutorList, 'total'))
+                            {{ $tutorList->total() }}
+                            @else
+                            {{ count($tutorList) }}
+                            @endif
+                        </p>
+                </div>
+            </div>
 
 
             <!-- Main Content Card -->
@@ -38,22 +41,18 @@
                         
                         <!-- Action Buttons -->
                         <div class="flex flex-wrap gap-3">
-                            <button onclick="generateReport()" class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
+                            <button onclick="generateReport()" class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
+                                <span class="text-lg">🖨️</span>
                                 Generate Report
                             </button>
-                            <button onclick="exportData()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                            <!-- <button onclick="exportData()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                                 Export
-                            </button>
-                            <a href="{{ route('tutors.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
+                            </button> -->
+                            <a href="{{ route('tutors.create') }}" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2">
+                                <span class="text-lg">➕</span>
                                 Add New Tutor
                             </a>
                         </div>
@@ -96,9 +95,9 @@
                 <!-- Table Section -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gradient-to-r from-slate-700 to-gray-800 text-white">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white-500 uppercase tracking-wider">
                                     <button class="flex items-center space-x-1 hover:text-gray-700">
                                         <span>Tutor Information</span>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,10 +105,10 @@
                                         </svg>
                                     </button>
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Details</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject Assignment</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white-500 uppercase tracking-wider">Contact Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white-500 uppercase tracking-wider">Subject Assignment</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-white-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -189,16 +188,16 @@
                                     <!-- Actions -->
                                     <td class="px-6 py-4 text-center">
                                         <div class="flex justify-center items-center space-x-3">
+        
                                             
-                                            
-                                            <a href="{{ route('tutors.edit', $tutor->id) }}" class="text-indigo-600 hover:text-indigo-800 transition-colors" title="Edit">
+                                            <a href="{{ route('tutors.edit', $tutor->id) }}" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-all duration-200 shadow-sm hover:shadow-md" title="Edit">
                                                 ✏️
                                             </a>
 
                                             <form action="{{ route('tutors.destroy', $tutor->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this tutor? This action cannot be undone.')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Delete">
+                                                <button type="submit" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md"  title="Delete">
                                                     🗑️
                                                 </button>
                                             </form>
@@ -260,74 +259,67 @@
     </div>
 
     <script>
-        function generateReport() {
+   function generateReport() {
     document.getElementById('reportModal').classList.remove('hidden');
 
     const rows = document.querySelectorAll('tbody tr');
     const totalTutors = rows.length;
 
-    // Initialize counters
-    let rendah = 0, menengah = 0, agama = 0;
-
-    // Loop through each row to count tutors by level
+    let tutorTableRows = '';
     rows.forEach(row => {
-        const level = row.getAttribute('data-level');
-        switch (level?.toLowerCase()) {
-            case 'sekolah rendah':
-                rendah++;
-                break;
-            case 'sekolah menengah':
-                menengah++;
-                break;
-            case 'sekolah agama':
-                agama++;
-                break;
-        }
+        const name = row.querySelector('.text-sm.font-medium')?.textContent || '';
+        const ic = row.querySelector('.text-sm.text-gray-500')?.textContent.replace('IC: ', '') || '';
+        const email = row.querySelector('td:nth-child(2) div:first-child')?.textContent.trim() || '';
+        const phone = row.querySelector('td:nth-child(2) div:nth-child(2)')?.textContent.trim() || '';
+        const address = row.querySelector('td:nth-child(2) div:nth-child(3) span')?.textContent || '';
+        const subject = row.querySelector('td:nth-child(3) .bg-indigo-100')?.textContent || 'Unassigned';
+        const status = row.querySelector('td:nth-child(4) span')?.textContent.trim() || '';
+
+        // Extract Level and Class from a custom data attribute or hidden span if available
+        const level = row.getAttribute('data-level') || '';
+        const subjectClass = row.getAttribute('data-class') || '';
+
+        tutorTableRows += `
+            <tr class="border-b">
+                <td class="px-4 py-2 font-medium">${name}<br><span class="text-sm text-gray-500">IC: ${ic}</span></td>
+                <td class="px-4 py-2">${email}<br>${phone}<br><span class="text-sm">${address}</span></td>
+                <td class="px-4 py-2">${subject}</td>
+                <td class="px-4 py-2">${status}</td>
+                <td class="px-4 py-2">
+                    Level: ${level || 'N/A'}<br>Class: ${subjectClass || 'N/A'}
+                </td>
+            </tr>
+        `;
     });
 
     const reportContent = `
         <div class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-blue-900">Total Tutors</h4>
-                    <p class="text-2xl font-bold text-blue-600">${totalTutors}</p>
-                </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-blue-900">Total Tutors</h4>
+                <p class="text-2xl font-bold text-blue-600">${totalTutors}</p>
             </div>
 
             <div class="mt-6">
-                <h4 class="font-semibold mb-3">Performance Summary</h4>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-600">
-                        Generated on: ${new Date().toLocaleString()}<br>
-                        This report provides an overview of the current tutor management system status.
-                    </p>
-                </div>
-
-                <div class="mt-4">
-                    <h5 class="font-medium mb-2">Level Distribution</h5>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                            <span class="text-sm">Sekolah Rendah</span>
-                            <span class="text-sm font-medium">${rendah} tutors</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                            <span class="text-sm">Sekolah Menengah</span>
-                            <span class="text-sm font-medium">${menengah} tutors</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
-                            <span class="text-sm">Sekolah Agama</span>
-                            <span class="text-sm font-medium">${agama} tutors</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <h5 class="font-medium mb-2">Recommendations</h5>
-                    <ul class="text-sm text-gray-600 space-y-1">
-                        <li>• Consider recruiting more tutors for high-demand levels</li>
-                        <li>• Review unassigned tutors for potential subject matching</li>
-                        <li>• Regular performance evaluations recommended</li>
-                    </ul>
+                <h4 class="font-semibold mb-3">Detailed Tutor Information</h4>
+                <p class="text-sm text-gray-600 mb-4">
+                    Generated on: ${new Date().toLocaleString()}<br>
+                    This report includes subject level and class information.
+                </p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left">Name & IC</th>
+                                <th class="px-4 py-2 text-left">Contact</th>
+                                <th class="px-4 py-2 text-left">Subject</th>
+                                <th class="px-4 py-2 text-left">Status</th>
+                                <th class="px-4 py-2 text-left">Level & Class</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            ${tutorTableRows}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -341,6 +333,8 @@
 
     document.getElementById('reportContent').innerHTML = reportContent;
 }
+
+
 
 
         function closeModal() {

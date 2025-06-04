@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-grey leading-tight bg-blue-200 px-4 py-2 rounded">
-            {{ __('Fee Payments') }}
+            {{ __('Student Management') }}
         </h2>
     </x-slot>
 
@@ -9,8 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold">Student Management</h2>
         <!-- Enhanced Filter Form -->
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border-0">
             <div class="flex items-center gap-3 mb-4">
@@ -72,10 +75,8 @@
                     <h3 class="text-lg font-semibold text-gray-800">Payment Analytics</h3>
                 </div>
                 <button onclick="exportToPDF()" class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Export to PDF
+                    <span class="text-lg">🖨️</span>
+                    Generate Report
                 </button>
             </div>
 
@@ -141,37 +142,37 @@
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <!-- Payment Status Chart -->
-                <div class="bg-gray-50 p-6 rounded-xl">
+                <div class="bg-gray-50 p-6 rounded-xl" style="width: 400px; height: 400px;">
                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
                         </svg>
                         Payment Status Distribution
                     </h4>
-                    <canvas id="paymentStatusChart" width="400" height="300"></canvas>
+                    <canvas id="paymentStatusChart"></canvas>
                 </div>
 
                 <!-- Level Distribution Chart -->
-                <div class="bg-gray-50 p-6 rounded-xl">
+                <div class="bg-gray-50 p-6 rounded-xl" style="width: 400px; height: 400px;">
                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                         Students by Level
                     </h4>
-                    <canvas id="levelChart" width="400" height="300"></canvas>
+                    <canvas id="levelChart"></canvas>
                 </div>
             </div>
 
             <!-- Revenue Chart -->
-            <div class="bg-gray-50 p-6 rounded-xl">
+            <div class="bg-gray-50 p-6 rounded-xl" style="width: 850px; height: 400px;">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
                     Revenue by Level
                 </h4>
-                <canvas id="revenueChart" width="800" height="400"></canvas>
+                <canvas id="revenueChart"></canvas>
             </div>
         </div>
 
@@ -525,97 +526,150 @@
             }
         }
 
-        // PDF Export Function
         async function exportToPDF() {
-            try {
-                // Check if required libraries are loaded
-                if (typeof window.jspdf === 'undefined') {
-                    showNotification('PDF library not loaded. Please refresh the page and try again.', 'error');
-                    return;
+    try {
+        // Check if required libraries are loaded
+        if (typeof window.jspdf === 'undefined') {
+            showNotification('PDF library not loaded. Please refresh the page and try again.', 'error');
+            return;
+        }
+
+        showNotification('Generating PDF report...', 'info');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        // Add logo (replace 'logoURL' with your actual image URL or base64 string)
+        const logoURL = 'https://yourdomain.com/path/to/logo.png'; 
+        // Replace with your logo URL or base64 data
+        const logoWidth = 30;  // width in mm
+        const logoHeight = 15; // height in mm
+
+        if (logoURL) {
+            // Load image and add (async load with img element)
+            const img = new Image();
+            img.src = logoURL;
+            await new Promise((resolve) => {
+                img.onload = () => {
+                    pdf.addImage(img, 'PNG', 20, 15, logoWidth, logoHeight);
+                    resolve();
+                };
+                img.onerror = () => {
+                    // If loading logo fails, continue without it
+                    resolve();
+                };
+            });
+        }
+
+        // Add Title next to logo
+        pdf.setFontSize(22);
+        pdf.setTextColor(44, 82, 130);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Fee Payments Report', 60, 25);
+
+        // Add horizontal line under header
+        pdf.setDrawColor(44, 82, 130);
+        pdf.setLineWidth(0.8);
+        pdf.line(20, 35, 190, 35);
+
+        // Add generation date below line
+        pdf.setFontSize(10);
+        pdf.setTextColor(107, 114, 128);
+        const currentDate = new Date().toLocaleDateString('en-GB');
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Generated on: ${currentDate}`, 20, 42);
+
+        // Section: Summary Statistics
+        let yPos = 52;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text('Summary Statistics', 20, yPos);
+
+        pdf.setDrawColor(200);
+        pdf.setLineWidth(0.3);
+        pdf.line(20, yPos + 2, 190, yPos + 2);
+
+        yPos += 10;
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Total Students: ${students.length}`, 25, yPos);
+        pdf.text(`Total Revenue: RM ${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`, 25, yPos + 8);
+        pdf.text(`Fully Paid: ${fullyPaidCount}`, 25, yPos + 16);
+        pdf.text(`Pending Payment: ${pendingPaymentCount}`, 25, yPos + 24);
+
+        // Section: Students by Level
+        yPos += 40;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Students by Level', 20, yPos);
+        pdf.line(20, yPos + 2, 190, yPos + 2);
+
+        yPos += 10;
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        Object.entries(levelCounts).forEach(([level, count]) => {
+            pdf.text(`${level}: ${count} student${count !== 1 ? 's' : ''}`, 25, yPos);
+            yPos += 8;
+        });
+
+        // Section: Revenue by Level
+        yPos += 10;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Revenue by Level', 20, yPos);
+        pdf.line(20, yPos + 2, 190, yPos + 2);
+
+        yPos += 10;
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        Object.entries(revenueByLevel).forEach(([level, revenue]) => {
+            pdf.text(`${level}: RM ${revenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`, 25, yPos);
+            yPos += 8;
+        });
+
+        // Section: Student Details (Top 20)
+        if (students.length > 0) {
+            yPos += 15;
+            pdf.setFontSize(14);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Student Details (Top 20)', 20, yPos);
+            pdf.line(20, yPos + 2, 190, yPos + 2);
+
+            yPos += 10;
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+
+            students.slice(0, 20).forEach((student, index) => {
+                if (yPos > 270) {
+                    pdf.addPage();
+                    yPos = 20;
                 }
 
-                showNotification('Generating PDF report...', 'info');
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                // Add title
-                pdf.setFontSize(20);
-                pdf.setTextColor(44, 82, 130);
-                pdf.text('Fee Payments Report', 20, 20);
-                
-                // Add date
-                pdf.setFontSize(12);
-                pdf.setTextColor(107, 114, 128);
-                const currentDate = new Date().toLocaleDateString('en-GB');
-                pdf.text(`Generated on: ${currentDate}`, 20, 30);
-                
-                // Add summary statistics
-                pdf.setFontSize(14);
-                pdf.setTextColor(0, 0, 0);
-                pdf.text('Summary Statistics', 20, 45);
-                
-                pdf.setFontSize(11);
-                pdf.text(`Total Students: ${students.length}`, 20, 55);
-                pdf.text(`Total Revenue: RM ${totalRevenue.toLocaleString()}`, 20, 65);
-                pdf.text(`Fully Paid: ${fullyPaidCount}`, 20, 75);
-                pdf.text(`Pending Payment: ${pendingPaymentCount}`, 20, 85);
-                
-                // Add level breakdown
-                pdf.text('Students by Level:', 20, 100);
-                let yPos = 110;
-                Object.entries(levelCounts).forEach(([level, count]) => {
-                    pdf.text(`${level}: ${count} students`, 25, yPos);
-                    yPos += 8;
-                });
-                
-                // Add revenue breakdown
-                yPos += 10;
-                pdf.text('Revenue by Level:', 20, yPos);
-                yPos += 10;
-                Object.entries(revenueByLevel).forEach(([level, revenue]) => {
-                    pdf.text(`${level}: RM ${revenue.toLocaleString()}`, 25, yPos);
-                    yPos += 8;
-                });
-                
-                // Add student details if space allows
-                if (students.length > 0 && yPos < 200) {
-                    yPos += 15;
-                    pdf.setFontSize(12);
-                    pdf.text('Student Details (Top 20):', 20, yPos);
-                    yPos += 10;
-                    
-                    pdf.setFontSize(9);
-                    students.slice(0, 20).forEach((student, index) => {
-                        if (yPos > 270) {
-                            pdf.addPage();
-                            yPos = 20;
-                        }
-                        
-                        const totalPaid = parseFloat(student.totalPaid || student.total_paid || 0);
-                        const status = totalPaid > 0 ? 'Paid' : 'Pending';
-                        const text = `${index + 1}. ${student.name || 'N/A'} - ${student.level || 'N/A'} - RM ${totalPaid.toFixed(2)} - ${status}`;
-                        pdf.text(text, 20, yPos);
-                        yPos += 6;
-                    });
-                    
-                    if (students.length > 20) {
-                        pdf.text(`... and ${students.length - 20} more students`, 20, yPos + 5);
-                    }
-                }
-                
-                // Save PDF
-                const filename = `fee-payments-report-${new Date().toISOString().split('T')[0]}.pdf`;
-                pdf.save(filename);
-                
-                // Show success message
-                showNotification('PDF report generated successfully!', 'success');
-                
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                showNotification('Error generating PDF report: ' + error.message, 'error');
+                const totalPaid = parseFloat(student.totalPaid || student.total_paid || 0);
+                const status = totalPaid > 0 ? 'Paid' : 'Pending';
+                const text = `${index + 1}. ${student.name || 'N/A'} - ${student.level || 'N/A'} - RM ${totalPaid.toFixed(2)} - ${status}`;
+                pdf.text(text, 20, yPos);
+                yPos += 7;
+            });
+
+            if (students.length > 20) {
+                pdf.text(`... and ${students.length - 20} more student${students.length - 20 !== 1 ? 's' : ''}`, 20, yPos + 5);
             }
         }
+
+        // Save PDF
+        const filename = `fee-payments-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(filename);
+
+        showNotification('PDF report generated successfully!', 'success');
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('Error generating PDF report: ' + error.message, 'error');
+    }
+}
+
         
         // Notification function
         function showNotification(message, type) {

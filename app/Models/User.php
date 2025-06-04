@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function parentInfo()
 {
-    return $this->hasOne(ParentInfo::class);
+    return $this->hasOne(ParentInfo::class, 'user_id');
 }
 
 public function students()
