@@ -68,7 +68,7 @@
       <div>
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Vision</h2>
         <p class="text-gray-600 mb-4 text-justify">
-          Pusat Tuisyen Sahabat Al Fateh aspires to become a leading educational center in Malaysia that 
+          Pusat Tuisyen Aimi An Najjah aspires to become a leading educational center in Malaysia that 
           fosters academic excellence and character development through a holistic and innovative educational approach. 
           We are committed to nurturing a generation of knowledgeable students with noble character who are prepared to face future challenges.
         </p>
