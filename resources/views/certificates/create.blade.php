@@ -7,8 +7,10 @@
                     <span class="hidden sm:inline">Back</span>
                 </button>
                 <h2 class="font-semibold text-xl text-grey leading-tight bg-blue-200 px-4 py-2 rounded">
-            {{ __('Tutor Certificate Upload') }}
-        </h2>
+                    {{ __('Tutor Certificate Upload') }}
+                </h2>
+            </div>
+        </div>
     </x-slot>
 
     <!-- Add required styles and scripts -->
@@ -153,8 +155,8 @@
                     </div>
 
                     <!-- Upload Button -->
-                    <button id="uploadAndIssue" disabled class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-200 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg">
-                        <i class="fas fa-certificate"></i>
+                   <button id="uploadAndIssue" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg">
+                    <i class="fas fa-certificate"></i>
                         <span>Upload & Issue Certificate</span>
                     </button>
                 </div>
@@ -205,7 +207,7 @@
         let contract;
 
         // Replace with your deployed contract address
-        const contractAddress = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
+        const contractAddress = "0x9F5D3F131d9A34E6e30fEA4eb5a6F7F3f1d8E1d6";
 
         const contractABI = [
             {

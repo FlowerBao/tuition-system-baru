@@ -14,13 +14,10 @@ class CertificateController extends Controller
     }
 
     public function index()
-{
-    // Assuming you have a Certificate model with a relationship to Tutor (User)
-    $certificateList = Certificate::with('tutor')->get();
-
-    return view('certificates.index', compact('certificateList'));
-}
-
+    {
+        $certificateList = Certificate::all();
+        return view('certificates.index', compact('certificateList'));
+    }
 
     public function uploadToIPFS(Request $request)
     {
@@ -29,6 +26,7 @@ class CertificateController extends Controller
         ]);
 
         $file = $request->file('certificate');
+
         $response = Http::withHeaders([
             'pinata_api_key' => env('PINATA_API_KEY'),
             'pinata_secret_api_key' => env('PINATA_SECRET_API_KEY'),
@@ -37,9 +35,17 @@ class CertificateController extends Controller
         )->post('https://api.pinata.cloud/pinning/pinFileToIPFS');
 
         if ($response->successful()) {
-            return response()->json(['ipfs_hash' => $response['IpfsHash']]);
+            $ipfsHash = $response['IpfsHash'];
+            $ipfsUrl = "https://ipfs.io/ipfs/" . $ipfsHash;
+
+            Certificate::create([
+                'name' => $file->getClientOriginalName(),
+                'file_path' => $ipfsUrl,
+            ]);
+
+            return redirect()->route('certificates.index')->with('success', 'Certificate uploaded and stored on IPFS!');
         } else {
-            return response()->json(['error' => 'IPFS upload failed'], 500);
+            return back()->with('error', 'IPFS upload failed');
         }
     }
 }
