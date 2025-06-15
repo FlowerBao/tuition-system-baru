@@ -39,4 +39,9 @@ class Tutor extends Model
     {
         return $this->hasMany(Material::class);
     }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class, 'tutor_id');
+    }
 }

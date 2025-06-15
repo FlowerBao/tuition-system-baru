@@ -138,17 +138,13 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/fee-payments/admin-view', [FeePaymentController::class, 'adminView'])->name('fee_payments.admin_view');
 Route::post('/fee-payments/{student}/reminder', [FeePaymentController::class, 'sendReminder'])->name('fee_payments.reminder');
 
+
 //send reminder email regarding fee payment
 Route::post('/fee-payments/remind/{student}', [FeePaymentController::class, 'sendReminder'])
     ->name('fee_payments.remind');
 
 Route::get('/admin/fee-payments/export-pdf', [FeePaymentController::class, 'exportPdf'])->name('fee-payments.export-pdf');
 
-
-//fee for admin 
-// routes/web.php
-// Route::get('/admin/fee-payments', [FeePaymentController::class, 'adminView'])->name('fee_payments.admin-index');
-// Route::post('/fee-payments/{student}/reminder', [FeePaymentController::class, 'sendReminder'])->name('fee_payments.reminder');
 
 
 //timetable
@@ -168,5 +164,15 @@ Route::get('/certificates/create', [CertificateController::class, 'create'])->na
 Route::post('/certificates/upload-ipfs', [CertificateController::class, 'uploadToIPFS'])->name('certificates.upload-ipfs');
 Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates.index');
 
+//about page- parent view certificate
+Route::get('/about', [CertificateController::class, 'publicView'])->name('about');
+
 // Route::post('/timetables', [TimetableController::class, 'store'])->name('timetables.store');
 require __DIR__.'/auth.php';
+
+//route parent view attendance
+Route::middleware(['auth'])->group(function () {
+    Route::get('/parent/attendance', [\App\Http\Controllers\AttendanceController::class, 'parentView'])
+        ->name('parent.attendance');
+});
+

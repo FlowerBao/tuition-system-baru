@@ -180,52 +180,61 @@ class TimetableController extends Controller
 
     public function destroy(Timetable $timetable)
     {
+        $timetable->subject()->delete(); 
         $timetable->delete();
         return redirect()->route('timetables.index')->with('success', 'Timetable deleted successfully.');
     }
 
     public function display(Request $request)
-    {
-        $userId = Auth::id();
-        $levelFilter = $request->query('level');
-        $query = Timetable::with('subject');
+{
+    $userId = Auth::id();
+    $levelFilter = $request->query('level');
+    $query = Timetable::with('subject');
 
-        if (Auth::user()->is_admin) {
-            if ($levelFilter) {
-                $query->whereHas('subject', fn($q) => $q->where('level', $levelFilter));
-            }
-            $timetables = $query->get();
-            $levels = Subject::select('level')->distinct()->pluck('level');
-            return view('timetables.display', compact('timetables', 'levels'));
+    // === Admin ===
+    if (Auth::user()->is_admin) {
+        if ($levelFilter) {
+            $query->whereHas('subject', fn($q) => $q->where('level', $levelFilter));
         }
-
-        if (Auth::user()->role === 'tutor') {
-            $subjectIds = Tutor::where('user_id', $userId)->pluck('subject_id');
-            $timetables = $query->whereIn('subject_id', $subjectIds)->get();
-            return view('timetables.display', compact('timetables'));
-        }
-
-        if (Auth::user()->role === 'parents') {
-            // Get student IDs under this parent
-            $studentIds = StudentList::where('parent_id', $userId)->pluck('id');
-
-            // Get subject IDs via enrollments
-            $subjectIds = DB::table('enrollments')
-                ->whereIn('student_id', $studentIds)
-                ->distinct()
-                ->pluck('subject_id');
-
-            // Get matching timetables
-            $timetables = $query->whereIn('subject_id', $subjectIds)->get();
-
-            $students = StudentList::where('parent_id', $userId)->get();
-            $parentInfo = ParentInfo::where('user_id', $userId)->first();
-
-            return view('timetables.display', compact('timetables', 'students', 'parentInfo'));
-        }
-
-        return redirect()->route('home')->with('error', 'No timetables found for your role.');
+        $timetables = $query->get();
+        $levels = Subject::select('level')->distinct()->pluck('level');
+        return view('timetables.display', compact('timetables', 'levels'));
     }
+
+    // === Tutor ===
+    if (Auth::user()->role === 'tutor') {
+        $subjectIds = Tutor::where('user_id', $userId)->pluck('subject_id');
+        $timetables = $query->whereIn('subject_id', $subjectIds)->get();
+        return view('timetables.display', compact('timetables'));
+    }
+
+    // === Parent ===
+    if (Auth::user()->role === 'parents') {
+
+        $parentInfo = ParentInfo::where('user_id', $userId)->first();
+
+        if (!$parentInfo) {
+            return redirect()->back()->withErrors('Parent info not found.');
+        }
+
+
+        $students = StudentList::where('parent_id', $parentInfo->id)->get();
+        $studentIds = $students->pluck('id');
+
+
+        $subjectIds = DB::table('enrollments')
+            ->whereIn('student_id', $studentIds)
+            ->distinct()
+            ->pluck('subject_id');
+
+        $timetables = $query->whereIn('subject_id', $subjectIds)->get();
+
+        return view('timetables.display', compact('timetables', 'students', 'parentInfo'));
+    }
+
+    return redirect()->route('home')->with('error', 'No timetables found for your role.');
+}
+
 
     public function download()
     {

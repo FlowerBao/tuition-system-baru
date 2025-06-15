@@ -4,18 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Certificate;
+use App\Models\Tutor;
 use Illuminate\Support\Facades\Http;
 
 class CertificateController extends Controller
 {
     public function create()
     {
-        return view('certificates.create');
+        $tutors = Tutor::all(); // Change to User::where('role', 'tutor')->get() if no Tutor model
+        return view('certificates.create', compact('tutors'));
     }
 
     public function index()
     {
-        $certificateList = Certificate::all();
+        $certificateList = Certificate::with('tutor')->get();
         return view('certificates.index', compact('certificateList'));
     }
 
@@ -23,6 +25,7 @@ class CertificateController extends Controller
     {
         $request->validate([
             'certificate' => 'required|file|mimes:pdf,jpg,jpeg,png',
+            'tutor_id' => 'required|exists:tutors,id', // use users,id if no tutors table
         ]);
 
         $file = $request->file('certificate');
@@ -39,6 +42,7 @@ class CertificateController extends Controller
             $ipfsUrl = "https://ipfs.io/ipfs/" . $ipfsHash;
 
             Certificate::create([
+                'tutor_id' => $request->input('tutor_id'),
                 'name' => $file->getClientOriginalName(),
                 'file_path' => $ipfsUrl,
             ]);
@@ -48,4 +52,13 @@ class CertificateController extends Controller
             return back()->with('error', 'IPFS upload failed');
         }
     }
+
+    //parent view
+    public function publicView()
+    {
+        $certificates = \App\Models\Certificate::with('tutor')->latest()->get();
+        return view('about', compact('certificates'));
+    }
+
+
 }

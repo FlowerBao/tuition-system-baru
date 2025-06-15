@@ -157,12 +157,12 @@
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
-                                                    {{ strtoupper(substr($certificate->tutor->name ?? 'U', 0, 2)) }}
+                                                    {{ strtoupper(substr($certificate->tutor->tutor_name ?? 'U', 0, 2)) }}
                                                 </div>
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900 tutor-name">
-                                                    {{ $certificate->tutor->name ?? 'Unknown Tutor' }}
+                                                    {{ $certificate->tutor->tutor_name ?? 'Unknown Tutor' }}
                                                 </div>
                                                 <div class="text-sm text-gray-500">
                                                     Tutor ID: {{ $certificate->tutor->id ?? 'N/A' }}
@@ -187,22 +187,24 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="https://ipfs.io/ipfs/{{ $certificate->ipfsHash }}" 
-                                               target="_blank" 
-                                               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                </svg>
-                                                View
+                                            <a href="{{ $certificate->file_path }}" 
+                                            target="_blank" 
+                                            class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            View
                                             </a>
-                                            <button onclick="copyHash('{{ $certificate->ipfsHash }}')" 
-                                                    class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+
+                                            <!-- <button onclick="copyHash('{{ $certificate->file_path }}')" 
+                                                class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                                 </svg>
                                                 Copy Hash
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -292,35 +294,46 @@
             }
         }
 
-        // Copy IPFS hash
-        function copyHash(hash) {
-            navigator.clipboard.writeText(hash).then(() => {
+         function copyHash(hash) {
+        navigator.clipboard.writeText(hash)
+            .then(() => {
                 showToast('IPFS hash copied to clipboard!');
+            })
+            .catch(() => {
+                alert('Failed to copy hash. Please try manually.');
             });
-        }
-
+    }
+    
         // Export functionality
         function exportData() {
-            const rows = document.querySelectorAll('.certificate-row:not([style*="display: none"])');
-            let csvContent = "Tutor Name,IPFS Hash,Certificate Link\n";
-            
-            rows.forEach(row => {
-                const tutorName = row.querySelector('.tutor-name').textContent;
-                const hash = row.querySelector('button[onclick*="copyHash"]').getAttribute('onclick').match(/'([^']+)'/)[1];
-                const link = `https://ipfs.io/ipfs/${hash}`;
-                csvContent += `"${tutorName}","${hash}","${link}"\n`;
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'certificates_export.csv';
-            a.click();
-            window.URL.revokeObjectURL(url);
-            
-            showToast('Certificate data exported successfully!');
-        }
+    const rows = document.querySelectorAll('.certificate-row:not([style*="display: none"])');
+    let csvContent = "Tutor Name,IPFS Hash,Certificate Link\n";
+    
+    rows.forEach(row => {
+        const tutorCell = row.querySelector('.tutor-name');
+        const tutorName = tutorCell ? tutorCell.textContent.trim() : 'Unknown Tutor';
+
+        const button = row.querySelector('button[onclick*="copyHash"]');
+        const hashMatch = button?.getAttribute('onclick')?.match(/copyHash\('([^']+)'\)/);
+        const hash = hashMatch ? hashMatch[1] : '';
+
+        const link = `https://ipfs.io/ipfs/${hash}`;
+        csvContent += `"${tutorName}","${hash}","${link}"\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'certificates_export.csv';
+    document.body.appendChild(a); // append for Firefox compatibility
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+    showToast('Certificate data exported successfully!');
+}
+
 
         // Show toast notification
         function showToast(message) {

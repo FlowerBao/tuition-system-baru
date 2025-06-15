@@ -21,36 +21,46 @@ class MaterialController extends Controller
         $user = Auth::user();
         $role = $user->role;
 
-        // === Parent Role ===
-        if ($role === 'parents') {
-            $students = StudentList::where('parent_id', $user->id)->get();
-            $selectedStudentId = $request->input('student_id');
-            $selectedSubjectId = $request->input('subject_id');
+  if ($role === 'parents') {
+    // Get parent_infos.id that belongs to this user
+    $parentInfo = \App\Models\ParentInfo::where('user_id', $user->id)->first();
 
-            $studentIds = $students->pluck('id');
-            $enrollments = Enrollment::whereIn('student_id', $studentIds);
+    if (!$parentInfo) {
+        // Handle gracefully if parent info not found
+        return redirect()->back()->withErrors('Parent profile not found.');
+    }
 
-            if ($selectedStudentId) {
-                $enrollments->where('student_id', $selectedStudentId);
-            }
+    // Now use parent_infos.id to get students
+    $students = \App\Models\StudentList::where('parent_id', $parentInfo->id)->get();
 
-            if ($selectedSubjectId) {
-                $enrollments->where('subject_id', $selectedSubjectId);
-            }
+    $selectedStudentId = $request->input('student_id');
+    $selectedSubjectId = $request->input('subject_id');
 
-            $subjectIds = $enrollments->pluck('subject_id')->unique();
-            $materials = Material::whereIn('subject_id', $subjectIds)->latest()->get();
-            $subjects = Subject::whereIn('id', $subjectIds)->get();
+    $studentIds = $students->pluck('id');
+    $enrollments = \App\Models\Enrollment::whereIn('student_id', $studentIds);
 
-            return view('materials.index', [
-                'materials' => $materials,
-                'isParent' => true,
-                'isTutor' => false,
-                'students' => $students,
-                'subjects' => $subjects,
-            ]);
-        }
+    if ($selectedStudentId) {
+        $enrollments->where('student_id', $selectedStudentId);
+    }
 
+    if ($selectedSubjectId) {
+        $enrollments->where('subject_id', $selectedSubjectId);
+    }
+
+    $enrollments = $enrollments->get();
+    $subjectIds = $enrollments->pluck('subject_id')->unique();
+
+    $materials = \App\Models\Material::whereIn('subject_id', $subjectIds)->latest()->get();
+    $subjects = \App\Models\Subject::whereIn('id', $subjectIds)->get();
+
+    return view('materials.index', [
+        'materials' => $materials,
+        'isParent' => true,
+        'isTutor' => false,
+        'students' => $students,
+        'subjects' => $subjects,
+    ]);
+}
         // === Tutor Role ===
         if ($role === 'tutor') {
             $tutorSubjectIds = Tutor::where('user_id', $user->id)->pluck('subject_id');

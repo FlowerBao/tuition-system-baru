@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Subject;
+use App\Models\Timetable;
 use App\Models\StudentList;
 use App\Models\Tutor;
+use App\Models\ParentInfo;
+use App\Models\Enrollment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -114,4 +118,71 @@ class AttendanceController extends Controller
 
         return redirect()->route('attendances.index')->with('success', 'Attendance submitted successfully!');
     }
+
+
+ public function parentView(Request $request)
+{
+    $userId = Auth::id();
+    $selectedStudentId = $request->input('student_id');
+    $selectedSubjectId = $request->input('subject_id');
+    $selectedMonth = $request->input('month') ?? now()->format('Y-m');
+
+    $parentInfo = ParentInfo::where('user_id', $userId)->first();
+    if (!$parentInfo) {
+        return redirect()->back()->withErrors('Parent profile not found.');
+    }
+
+    $students = StudentList::where('parent_id', $parentInfo->id)->get();
+    $studentIds = $students->pluck('id');
+
+    // Get enrollments of students to get their subject days
+    $enrolledSubjectIds = Attendance::whereIn('student_id', $studentIds)
+        ->pluck('subject_id')
+        ->unique();
+
+    if ($selectedSubjectId) {
+        $enrolledSubjectIds = $enrolledSubjectIds->filter(fn($id) => $id == $selectedSubjectId);
+    }
+
+    // Fetch the days these subjects are scheduled (e.g., Monday, Tuesday)
+    $scheduledDays = Timetable::whereIn('subject_id', $enrolledSubjectIds)
+        ->pluck('day')
+        ->unique()
+        ->map(fn($day) => strtolower($day)); // Ensure day format matches Carbon::dayName
+
+    // Filter month dates to include only those matching the scheduled days
+    $yearMonth = Carbon::createFromFormat('Y-m', $selectedMonth);
+    $datesInMonth = collect(range(1, $yearMonth->daysInMonth))->map(function ($day) use ($yearMonth, $scheduledDays) {
+        $date = $yearMonth->copy()->day($day);
+        return $scheduledDays->contains(strtolower($date->format('l'))) ? $date->toDateString() : null;
+    })->filter();
+
+    // Attendance records filtered by month and selected filters
+    $attendanceQuery = Attendance::with(['student', 'subject', 'tutor'])
+        ->whereIn('student_id', $studentIds)
+        ->whereIn('date', $datesInMonth);
+
+    if ($selectedStudentId) {
+        $attendanceQuery->where('student_id', $selectedStudentId);
+    }
+
+    if ($selectedSubjectId) {
+        $attendanceQuery->where('subject_id', $selectedSubjectId);
+    }
+
+    $attendances = $attendanceQuery->get();
+    $groupedAttendances = $attendances->groupBy(fn($a) => $a->student_id . '-' . $a->date);
+    $subjects = Subject::whereIn('id', $attendances->pluck('subject_id')->unique())->get();
+
+    return view('parents.attendance', compact(
+        'students',
+        'groupedAttendances',
+        'selectedStudentId',
+        'selectedSubjectId',
+        'selectedMonth',
+        'datesInMonth',
+        'subjects'
+    ));
+}
+
 }

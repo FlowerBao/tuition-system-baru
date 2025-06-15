@@ -13,7 +13,7 @@
                 <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-8 py-6 border-b border-gray-200">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                         <div>
-                            <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                            <h2 class="text-2xl font-bold">
                                 @if ($isParent)
                                     Your Children's Learning Materials
                                 @elseif ($isTutor)
@@ -95,6 +95,19 @@
                                     </div>
                                 @endif
                             </div>
+
+                            {{-- Clear Filters Button --}}
+                            @if(request('student_id') || request('subject_id'))
+                                <div class="flex justify-end pt-2">
+                                    <a href="{{ route('materials.index') }}" 
+                                       class="inline-flex items-center px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                        Clear Filters
+                                    </a>
+                                </div>
+                            @endif
                         </form>
                     </div>
                 @endif
