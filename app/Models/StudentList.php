@@ -14,18 +14,8 @@ class StudentList extends Model
         'ic',
         'level',
         'phone',
-        'user_id',
         'parent_id',
-        // Removed subject_id
     ];
-
-    // Remove or revise this if not needed
-    public function reserves()
-    {
-        // This looks off — does a student really "have many" student lists by user_id?
-        return $this->hasMany(StudentList::class, 'user_id');
-    }
-
 
     public function parent()
     {
@@ -37,24 +27,18 @@ class StudentList extends Model
         return $this->hasMany(Enrollment::class, 'student_id');
     }
 
-    // Optional: Helper to get subjects via enrollments
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'enrollments', 'student_id', 'subject_id') ->withTimestamps();
+        return $this->belongsToMany(Subject::class, 'enrollments', 'student_id', 'subject_id')->withTimestamps();
     }
-    
 
     public function feePayments()
-{
-    return $this->hasMany(FeePayment::class, 'student_id');
-}
+    {
+        return $this->hasMany(FeePayment::class, 'student_id');
+    }
 
-
-// In App\Models\StudentList.php
-public function hasUnpaidFees()
-{
-    // Returns true if the student has any fee payments with status other than 'paid'
-    return $this->feePayments()->where('status', '!=', 'paid')->exists();
-}
-
+    public function hasUnpaidFees()
+    {
+        return $this->feePayments()->where('status', '!=', 'paid')->exists();
+    }
 }

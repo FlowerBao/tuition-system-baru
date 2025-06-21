@@ -39,7 +39,7 @@ class StudentListController extends Controller
 {
     $request->validate([
         'name' => 'required|string|max:255',
-        'ic' => 'required|string|max:20|unique:users,email', // ensures IC is unique as email
+        'ic' => 'required|string|max:20|unique:student_lists,ic', // ensure IC is unique in student_lists
         'level' => 'required|string|max:255',
         'phone' => 'nullable|string|max:15',
         'subject_id' => 'required|exists:subjects,id',
@@ -52,21 +52,12 @@ class StudentListController extends Controller
         return redirect()->back()->withErrors(['parent' => 'Parent info not found.']);
     }
 
-    // Create student user using IC as email and default password
-    $studentUser = \App\Models\User::create([
-        'name' => $request->name,
-        'email' => $request->ic, // use IC as email
-        'password' => bcrypt('12345678'), // default password
-        'role' => 'student',
-    ]);
-
-    // Store student data without subject_id
+    // Store student data directly without user account
     $student = \App\Models\StudentList::create([
         'name' => $request->name,
         'ic' => $request->ic,
         'level' => $request->level,
         'phone' => $request->phone,
-        'user_id' => $studentUser->id,
         'parent_id' => $parentInfo->id,
     ]);
 
@@ -78,6 +69,7 @@ class StudentListController extends Controller
 
     return redirect()->route('student_lists.index')->with('success', 'Student registered and enrolled successfully!');
 }
+
 
     
     public function dashboardAdmin()
