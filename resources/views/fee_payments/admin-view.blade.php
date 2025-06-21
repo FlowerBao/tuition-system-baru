@@ -239,7 +239,7 @@
 
                         <!-- Action Button -->
                         <div class="flex-shrink-0">
-                            @if ($student->hasUnpaidFees())
+                            @if ($student->hasUnpaidFees)
                                 <form action="{{ route('fee_payments.remind', $student->id) }}" method="POST" onsubmit="return confirm('Send reminder to this student\'s parent?');">
                                     @csrf
                                     <button type="submit" class="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">

@@ -156,7 +156,8 @@ public function adminView(Request $request)
 
     $students = StudentList::with([
         'subjects' => function ($query) {
-            $query->withPivot('created_at');
+            $query->select('subjects.id', 'name', 'price') // Ensure 'price' is loaded
+                  ->withPivot('created_at');
         },
         'feePayments'
     ])
@@ -165,10 +166,9 @@ public function adminView(Request $request)
     })
     ->get()
     ->map(function ($student) use ($selectedMonth, $selectedYear) {
-        // Filter enrollments by month/year
+        // Filter enrolled subjects by month/year
         $filteredSubjects = $student->subjects->filter(function ($subject) use ($selectedMonth, $selectedYear) {
             $createdAt = optional($subject->pivot)->created_at;
-
             if (!$createdAt) return false;
 
             $createdAt = \Carbon\Carbon::parse($createdAt);
@@ -191,8 +191,14 @@ public function adminView(Request $request)
             return $matchesMonth && $matchesYear;
         });
 
-        $student->totalPaid = $filteredPayments->where('status', 'paid')->sum('amount');
+        // Calculate totals
+        $totalPaid = $filteredPayments->where('status', 'paid')->sum('amount');
+        $totalFee = $filteredSubjects->sum('price');
+
+        // Set attributes for view
+        $student->totalPaid = $totalPaid;
         $student->payments = $filteredPayments;
+        $student->hasUnpaidFees = $filteredSubjects->isNotEmpty() && $totalPaid < $totalFee;
 
         return $student;
     })
@@ -200,6 +206,7 @@ public function adminView(Request $request)
 
     return view('fee_payments.admin-view', compact('students', 'selectedMonth', 'selectedYear', 'selectedLevel'));
 }
+
 
     /**
      * Admin sends reminder to unpaid students' parents (stubbed).
