@@ -26,11 +26,13 @@ class FeeReminder extends Mailable
         $this->student = $student;
     }
 
-    public function build()
-    {
-        return $this->subject('Fee Payment Reminder for ' . $this->student->name)
-                    ->view('emails.fee_reminder');
-    }
+   public function build()
+{
+    return $this->subject('Fee Payment Reminder')
+                ->view('emails.fee_reminder')
+                ->with(['student' => $this->student]);
+}
+
 
     /**
      * Get the message envelope.
