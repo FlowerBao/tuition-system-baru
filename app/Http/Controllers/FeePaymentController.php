@@ -213,12 +213,12 @@ public function adminView(Request $request)
      */
     public function sendReminder(StudentList $student)
 {
-    $parent = $student->parent;
+    $parentInfo = $student->parent; // now this is ParentInfo model
+    $parentUser = $parentInfo?->user;
 
-    if ($parent && $parent->email) {
-        Mail::to($parent->email)->send(new FeeReminder($student));
-
-        return back()->with('success', 'Reminder email sent to parent: ' . $parent->email);
+    if ($parentUser && $parentUser->email) {
+        Mail::to($parentUser->email)->send(new FeeReminder($student));
+        return back()->with('success', 'Reminder email sent to parent: ' . $parentUser->email);
     }
 
     return back()->with('error', 'Parent contact not found.');

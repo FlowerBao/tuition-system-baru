@@ -19,7 +19,8 @@ class StudentList extends Model
 
     public function parent()
     {
-        return $this->belongsTo(User::class, 'parent_id');
+        // return $this->belongsTo(User::class, 'parent_id');
+        return $this->belongsTo(\App\Models\ParentInfo::class, 'parent_id');
     }
 
     public function enrollments()
